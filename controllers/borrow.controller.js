@@ -19,8 +19,8 @@ exports.addBorrowing = async (request, response) => {
     let newData = {
         memberID: request.body.memberID,
         adminID: request.body.adminID,
-        date_of_borrow: today.toLocaleDateString(),
-        date_of_return: nextWeek.toLocaleDateString(),
+        date_of_borrow: request.body.dateOfBorrow,
+        date_of_return: request.body.dateOfReturn,
         status: false
     }
 
@@ -82,8 +82,8 @@ exports.updateBorrowing = async (request, response) => {
     let newData = {
         memberID: request.body.memberID,
         adminID: request.body.adminID,
-        date_of_borrow: request.body.date_of_borrow,
-        date_of_return: request.body.date_of_return,
+        date_of_borrow: request.body.dateOfBorrow,
+        date_of_return: request.body.dateOfReturn,
         status: request.body.status
     }
 
@@ -141,9 +141,7 @@ exports.deleteBorrowing = async (request, response) => {
     let borrowID = request.params.id
 
     /** delete detailsOfBorrow using model */
-    detailsOfBorrowModel.destroy(
-        { where: { borrowID: borrowID } }
-    )
+    detailsOfBorrowModel.destroy({ where: { borrowID: borrowID } })
         .then(result => {
             /** delete borrow's data using model */
             borrowModel.destroy({ where: { id: borrowID } })
@@ -214,6 +212,30 @@ exports.returnBook = async (request, response) => {
 exports.getBorrow = async (request, response) => {
     let data = await borrowModel.findAll(
         {
+            include: [
+                `member`, `admin`,
+                {
+                    model: detailsOfBorrowModel,
+                    as: `details_of_borrow`,
+                    include: ["book"]
+                }
+            ]
+        }
+    )
+
+    return response.json({
+        success: true,
+        data: data,
+        message: `All borrowing book have been loaded`
+    })
+}
+
+/** create function for get all borrowing data */
+exports.getBorrowById = async (request, response) => {
+    memberID = request.params.memberID
+    let data = await borrowModel.findAll(
+        {
+            where: { memberID: memberID, status: false },
             include: [
                 `member`, `admin`,
                 {

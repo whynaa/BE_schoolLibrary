@@ -28,5 +28,8 @@ app.get("/return/:id", [authorize], borrowController.returnBook)
 /** create route to get all borrowed book */
 app.get("/", [authorize], borrowController.getBorrow)
 
+/** create route to get borrowed book by Id Member */
+app.get("/:memberID", [authorize], borrowController.getBorrowById)
+
 /** export app in order to load in another file */
 module.exports = app

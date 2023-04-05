@@ -31,7 +31,7 @@ exports.getByIdMember = async (request, response) => {
     let idMember = request.params.id
     
     /** call findAll() to get all data */
-    let member = await memberModel.findAll({ where: { id: idMember } })
+    let member = await memberModel.findOne({ where: { id: idMember } })
     return response.json({
         success: true,
         data: member,
