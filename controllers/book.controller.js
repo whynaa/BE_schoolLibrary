@@ -143,17 +143,19 @@ exports.updateBook = async (request, response) => {
             /** get old filename of cover file */
             const oldCoverBook = selectedBook.cover
 
-            /** prepare path of old cover to delete file */
-            const pathCover = path.join(__dirname, `../image/cover`, oldCoverBook)
+            if (oldCoverBook !== null){
+                /** prepare path of old cover to delete file */
+                const pathCover = path.join(__dirname, `../image/cover`, oldCoverBook)
 
-            /** check file existence */
-            if (fs.existsSync(pathCover)) {
-                /** delete old cover file */
-                fs.unlink(pathCover, error => console.log(error))
+                /** check file existence */
+                if (fs.existsSync(pathCover)) {
+                    /** delete old cover file */
+                    fs.unlink(pathCover, error => console.log(error))
+                }
             }
 
             /** add new cover filename to book object */
-            book.cover = request.file.filename    
+            dataBook.cover = request.file.filename    
         }
 
         /** execute update data based on defined id book */
@@ -184,27 +186,29 @@ exports.deleteBook = async (request, response) => {
     /** get old filename of cover file */
     const oldCoverBook = book.cover
 
-    /** prepare path of old cover to delete file */
-    const pathCover = path.join(__dirname, `../image/cover`, oldCoverBook)
+    if (oldCoverBook !== null){
+        /** prepare path of old cover to delete file */
+        const pathCover = path.join(__dirname, `../image/cover`, oldCoverBook)
 
-    /** check file existence */
-    if (fs.existsSync(pathCover)) {
-        /** delete old cover file */
-       fs.unlink(pathCover, error => console.log(error))
+        /** check file existence */
+        if (fs.existsSync(pathCover)) {
+            /** delete old cover file */
+        fs.unlink(pathCover, error => console.log(error))
+        }
     }
     /** -- end of delete cover file -- */
 
     /** execute delete data based on defined id book */
     bookModel.destroy({ where: { id: id } })
         .then(result => {
-            /** if update's process success */
+            /** if delete's process success */
             return response.json({
                 success: true,
                 message: `Data book has been deleted`
             })
         })
         .catch(error => {
-            /** if update's process fail */
+            /** if delete's process fail */
             return response.json({
                 success: false,
                 message: error.message

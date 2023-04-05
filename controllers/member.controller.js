@@ -137,13 +137,15 @@ exports.updateMember = (request, response) => {
             /** get old filename of photo file */
             const oldPhotoMember = selectedMember.photo
 
-            /** prepare path of old photo to delete file */
-            const pathPhoto = path.join(__dirname, `../image/photo`, oldPhotoMember)
+            if (oldPhotoMember !== null){
+                /** prepare path of old photo to delete file */
+                const pathPhoto = path.join(__dirname, `../image/photo`, oldPhotoMember)
 
-            /** check file existence */
-            if (fs.existsSync(pathPhoto)) {
-                /** delete old photo file */
-                fs.unlink(pathPhoto, error => console.log(error))
+                /** check file existence */
+                if (fs.existsSync(pathPhoto)) {
+                    /** delete old photo file */
+                    fs.unlink(pathPhoto, error => console.log(error))
+                }
             }
 
             /** add new photo filename to member object */
@@ -180,27 +182,29 @@ exports.deleteMember = async (request, response) => {
     /** get old filename of photo file */
     const oldPhotoMember = member.photo
 
-    /** prepare path of old photo to delete file */
-    const pathPhoto = path.join(__dirname, `../image/photo`, oldPhotoMember)
+    if (oldPhotoMember !== null){
+        /** prepare path of old photo to delete file */
+        const pathPhoto = path.join(__dirname, `../image/photo`, oldPhotoMember)
 
-    /** check file existence */
-    if (fs.existsSync(pathPhoto)) {
-        /** delete old photo file */
-       fs.unlink(pathPhoto, error => console.log(error))
+        /** check file existence */
+        if (fs.existsSync(pathPhoto)) {
+            /** delete old photo file */
+        fs.unlink(pathPhoto, error => console.log(error))
+        }
     }
     /** -- end of delete photo file -- */    
 
     /** execute delete data based on defined id member */
     memberModel.destroy({ where: { id: idMember } })
         .then(result => {
-            /** if update's process success */
+            /** if delete's process success */
             return response.json({
                 success: true,
                 message: `Data member has been deleted`
             })
         })
         .catch(error => {
-            /** if update's process fail */
+            /** if delete's process fail */
             return response.json({
                 success: false,
                 message: error.message

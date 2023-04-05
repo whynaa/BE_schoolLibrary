@@ -10,11 +10,8 @@ app.use(express.json())
 /** load book's controller */
 const bookController = require(`../controllers/book.controller`)
 
-/** load function from simple-middleware */
-const { midOne } = require(`../middlewares/simple-middleware`)
-
 /** create route to get data with method "GET" */
-app.get("/", [midOne], bookController.getAllBooks)
+app.get("/", bookController.getAllBooks)
 
 /** create route to get data by id with method "GET" */
 app.get("/:id", bookController.getByIdBook)

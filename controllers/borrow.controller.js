@@ -4,18 +4,24 @@ const borrowModel = require(`../models/index`).borrow
 /** load model for `details_of_borrow` table */
 const detailsOfBorrowModel = require(`../models/index`).details_of_borrow
 
+/** load model for `book` table */
+const bookModel = require(`../models/index`).book
+
 /** load Operator from  Sequelize  */
 const Op = require(`sequelize`).Op
 
 /** create function for add book borrowing */
 exports.addBorrowing = async (request, response) => {
+    const today = new Date()
+    const nextWeek = new Date(today.getTime() + 7 * 86400000);
+
     /** prepare data for borrow's table */
     let newData = {
         memberID: request.body.memberID,
         adminID: request.body.adminID,
-        date_of_borrow: request.body.date_of_borrow,
-        date_of_return: request.body.date_of_return,
-        status: request.body.status
+        date_of_borrow: today.toLocaleDateString(),
+        date_of_return: nextWeek.toLocaleDateString(),
+        status: false
     }
 
     /** execute for inserting to borrow's table */
@@ -28,11 +34,20 @@ exports.addBorrowing = async (request, response) => {
              * (type: array object)
              */
 
-            let detailsOfBorrow = request.body.details_of_borrow
+            let detailsOfBorrow = request.body.detailsOfBorrow
 
             /** insert borrowID to each item of detailsOfBorrow */
             for (let i = 0; i < detailsOfBorrow.length; i++) {
                 detailsOfBorrow[i].borrowID = borrowID
+                bookModel.findByPk(detailsOfBorrow[i].bookID)
+                .then(result => {
+                    newStock = result.stock - detailsOfBorrow[i].qty
+                    bookModel.update({stock : newStock}, { where: { id: detailsOfBorrow[i].bookID } })
+                })
+                .catch(error => {
+                    console.log(error.message)
+                })
+                    
             }
 
             /** insert all data of detailsOfBorrow */
@@ -49,6 +64,8 @@ exports.addBorrowing = async (request, response) => {
                         message: error.message
                     })
                 })
+            
+            /** update stock in each item of book */
 
         })
         .catch(error => {
