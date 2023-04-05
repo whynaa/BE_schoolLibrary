@@ -1,5 +1,3 @@
-const { binary } = require("joi")
-
 /** load model for `borrow` table */
 const borrowModel = require(`../models/index`).borrow
 
