@@ -1,3 +1,5 @@
+const { binary } = require("joi")
+
 /** load model for `borrow` table */
 const borrowModel = require(`../models/index`).borrow
 
@@ -108,6 +110,7 @@ exports.updateBorrowing = async (request, response) => {
             /** insert borrowID to each item of detailsOfBorrow */
             for (let i = 0; i < detailsOfBorrow.length; i++) {
                 detailsOfBorrow[i].borrowID = borrowID
+
             }
 
             /** re-insert all data of detailsOfBorrow */
@@ -176,16 +179,25 @@ exports.returnBook = async (request, response) => {
     let today = new Date()
     let currentDate = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`
 
+    let detailsOfBorrow = await detailsOfBorrowModel.findAll({ where: {borrowID: borrowID }})
+    detailsOfBorrow.forEach(detail => {
+        bookModel.findByPk(detail.bookID)
+                .then(result => {
+                    newStock = result.stock + detail.qty
+                    bookModel.update({stock : newStock}, { where: { id: detail.bookID } })
+                })
+                .catch(error => {
+                    console.log(error.message)
+                })
+    });
+
     /** update status and date_of_return from borrow's data */
-    borrowModel.update(
-        {
+    borrowModel.update({
             date_of_return: currentDate,
             status: true
-        },
-        {
+        },{
             where: { id: borrowID }
-        }
-    )
+        })
         .then(result => {
             return response.json({
                 success: true,
